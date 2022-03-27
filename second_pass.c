@@ -5,9 +5,6 @@
 #include "utils.h"
 #include "string.h"
 
-int process_second_pass_operand_old(line_descriptor line, long *curr_ic, long *ic, char *operand, machine_word **code_img,
-                                    table *symbol_table);
-
 int process_second_pass_operand(line_descriptor line, long *curr_ic, char *operand, machine_word **code_img,
                                 table *symbol_table);
 
@@ -128,64 +125,6 @@ bool add_symbol_to_machine_code(line_descriptor line, long *ic, machine_word **c
 	}
 	/* Make the current pass IC as the next line ic */
 	(*ic) = (*ic) + length;
-	return TRUE;
-}
-
-/**
- * Builds the additional data word for operand in the second pass, if needed.
- * @param curr_ic Current instruction pointer of source code line
- * @param ic Current instruction pointer of source code line start
- * @param operand The operand string
- * @param code_img The code image array
- * @param symbol_table The symbol table
- * @return Whether succeeded
- */
-int process_second_pass_operand_old(line_descriptor line, long *curr_ic, long *ic, char *operand, machine_word **code_img,
-                                    table *symbol_table) {
-	addressing_type addr = get_addressing_type(operand);
-	machine_word *word_to_write;
-    bool is_external = FALSE;
-	/* We already handled immediate addressing, we can keep going */
-	if (addr == IMMEDIATE_ADDR) {
-        (*curr_ic)++;
-    }
-	if (addr == INDEX_ADDR) {
-        operand++;
-    }
-	if (DIRECT_ADDR == addr || INDEX_ADDR == addr) {
-		long data_to_add;
-		table_entry *entry = find_by_types(*symbol_table, operand, 3, DATA_SYMBOL, CODE_SYMBOL, EXTERNAL_SYMBOL);
-		if (entry == NULL) {
-            fprintf_error_specific(line, "The symbol %s not found", operand);
-			return FALSE;
-		}
-		/*found symbol*/
-		data_to_add = entry->value;
-		/* Calculate the distance to the label from ic if needed */
-		if (addr == INDEX_ADDR) {
-			/* if not code symbol it's impossible to calculate distance! */
-			if (entry->type != CODE_SYMBOL) {
-                fprintf_error_specific(line,
-                                       "The symbol %s cannot be addressed relatively because it's not a code symbol.",
-                                       operand);
-				return FALSE;
-			}
-			data_to_add = data_to_add - *ic;
-		}
-		/* Add to externals reference table if it's an external. increase ic because it's the next data word */
-		if (entry->type == EXTERNAL_SYMBOL) {
-            is_external = TRUE;
-			add_table_item(symbol_table, operand, (*curr_ic) + 1, EXTERNAL_REFERENCE);
-		}
-
-		/*found symbol*/
-        /*
-		word_to_write = (machine_word *) better_malloc(sizeof(machine_word));
-		word_to_write->length = 0;
-		word_to_write->word.data = encode_operand_data(addr, data_to_add, is_external);
-		code_img[(++(*curr_ic)) - IC_INIT_VALUE] = word_to_write;
-*/
-	}
 	return TRUE;
 }
 

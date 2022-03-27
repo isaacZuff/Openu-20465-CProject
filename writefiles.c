@@ -84,14 +84,15 @@ static bool write_ob(machine_word **code_img, long *data_img, long icf, long dcf
             operand_word *opw  =code_img[i]->word.operand;
             val = 1<<(opw->ARE+16) | opw->funct<<12 | opw->source_register<<8 | opw->source_addressing<<6 | opw->destination_register<<2 | opw->destination_addressing;
         } else{
-            
+            operand_data_word *opdw = code_img[i]->word.data2;
+            val = 1<<(opdw->ARE+16) | opdw->data;
         }
         e = val & E_MASK;
         d = (val & D_MASK)>>4;
         c = (val & C_MASK)>>8;
         b = (val & B_MASK)>>12;
         a = (val & A_MASK)>>16;
-        printf("A%x-B%x-C%x-D%x-E%x\n",a,b,c,d,e);
+        fprintf(file_desc,"%04d A%x-B%x-C%x-D%x-E%x\n", IC_INIT_VALUE +i ,a,b,c,d,e);
     }
 
 	/* Write data2 image. dcf starts at 0 so it's fine */
