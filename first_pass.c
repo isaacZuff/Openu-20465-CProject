@@ -195,7 +195,7 @@ static bool process_code(line_descriptor line, int i, long *ic, machine_word **c
     start_ic = *ic;
 	/* allocate memory for a new word in the code image, and put the code word into it */
 	opcode_machine_word = (machine_word *) better_malloc(sizeof(machine_word));
-	(opcode_machine_word->word).opcode = opcode_word_temp;
+	opcode_machine_word->word.opcode = opcode_word_temp;
 	code_img[(*ic) - IC_INIT_VALUE] = opcode_machine_word; /* IC initialized to 100 but we shouldn't skip the first cells  */
 
     if(operand_word_temp != NULL) {
@@ -203,7 +203,7 @@ static bool process_code(line_descriptor line, int i, long *ic, machine_word **c
         operand_machine_word = (machine_word *) better_malloc(sizeof(machine_word));
         operand_machine_word->is_operand = TRUE;
         operand_machine_word->length=0;
-        (operand_machine_word->word).operand = operand_word_temp;
+        operand_machine_word->word.operand = operand_word_temp;
         code_img[(*ic) - IC_INIT_VALUE] = operand_machine_word;
     }
 

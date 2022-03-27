@@ -88,7 +88,7 @@ bool add_symbol_to_machine_code(line_descriptor line, long *ic, machine_word **c
 	char *operands[2];
 	int i = 0, operand_count;
 	bool isvalid = TRUE;
-	long curr_ic = *ic; /* using curr_ic as temp index inside the code image, in the current line code+data words */
+	long curr_ic = (*ic)+1; /* we need to change the values we left null inside an already built array so we'll work temp counter */
 	/* Get the total word length of current code text line in code binary image */
 	int length = code_img[(*ic) - IC_INIT_VALUE]->length;
 	/* if the length is 1, then there's only the code word, no data. */
@@ -215,23 +215,26 @@ int process_second_pass_operand(line_descriptor line, long *curr_ic, char *opera
         if (entry == NULL) {
             fprintf_error_specific(line, "[ERROR] Cant find symbol %s in second pass", operand);
             return FALSE;
+
         }
 
         if (entry->type == EXTERNAL_SYMBOL) {
             is_external = TRUE;
-            add_table_item(symbol_table, operand, (*curr_ic) + 1, EXTERNAL_REFERENCE);
+            add_table_item(symbol_table, operand, (*curr_ic) + 2, EXTERNAL_REFERENCE);
         }
 
-
         machine_base_word = (machine_word *) better_malloc(sizeof(machine_word));
+        machine_base_word->is_operand =FALSE;
         machine_base_word->length = 0;
         machine_base_word->word.data2 = encode_operand_data(addr, entry->base, is_external);
         code_img[(++(*curr_ic)) - IC_INIT_VALUE] = machine_base_word;
 
         machine_offset_word = (machine_word *) better_malloc(sizeof(machine_word));
+        machine_offset_word->is_operand =FALSE;
         machine_offset_word->length = 0;
         machine_offset_word->word.data2 = encode_operand_data(addr, entry->offset, is_external);
         code_img[(++(*curr_ic)) - IC_INIT_VALUE] = machine_offset_word;
+
 
 
     }

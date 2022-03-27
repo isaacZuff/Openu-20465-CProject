@@ -33,6 +33,8 @@ static bool write_entries_file(table tab, char *filename, char *file_extension);
 
 bool write_external_file(table tab, char *filename, char *file_extension);
 
+void bin(unsigned n);
+
 int write_output_files(machine_word **code_img, long *data_img, long icf, long dcf, char *filename,
                        table symbol_table) {
 	bool result;
@@ -51,7 +53,8 @@ int write_output_files(machine_word **code_img, long *data_img, long icf, long d
 
 static bool write_ob(machine_word **code_img, long *data_img, long icf, long dcf, char *filename) {
 	int i;
-	long val;
+    long val=0;
+
 	FILE *file_desc;
 	/* add extension of file to open */
 	char *output_filename = strcat_to_new(filename, ".ob");
@@ -70,28 +73,25 @@ static bool write_ob(machine_word **code_img, long *data_img, long icf, long dcf
 
 	/* starting from index 0, not IC_INIT_VALUE as icf, so we have to subtract it. */
 	for (i = 0; i < icf - IC_INIT_VALUE; i++) {
-        /* Place for '\0' */
-        char special_base[MACHINE_WORD_LENGTH+1]="";
+        int a,b,c,d,e;
         /* Only first opcode wards contain length field */
         if (code_img[i]->length > 0) {
+
             opcode_word *opc = code_img[i]->word.opcode;
-            /** Group A */
-            /* placeholder is always 0 => 0 Opcode is always A => 100  ==> 0100 = 4 */
-            special_base[0] = 'A';
-            special_base[1] = '4';
-
-            /** Group B-D rest of opcode */
-            special_base[opc->opcode] =
-            /** String end of line */
-            special_base[20] = '\0';
-
+            val = 1<< opc->opcode | 1<<(opc->ARE+16);
 
         } else if (code_img[i]->is_operand == TRUE) {
             operand_word *opw  =code_img[i]->word.operand;
+            val = 1<<(opw->ARE+16) | opw->funct<<12 | opw->source_register<<8 | opw->source_addressing<<6 | opw->destination_register<<2 | opw->destination_addressing;
         } else{
-
+            
         }
-        fprintf(file_desc, "%s\n", special_base);
+        e = val & E_MASK;
+        d = (val & D_MASK)>>4;
+        c = (val & C_MASK)>>8;
+        b = (val & B_MASK)>>12;
+        a = (val & A_MASK)>>16;
+        printf("A%x-B%x-C%x-D%x-E%x\n",a,b,c,d,e);
     }
 
 	/* Write data2 image. dcf starts at 0 so it's fine */
@@ -105,6 +105,13 @@ static bool write_ob(machine_word **code_img, long *data_img, long icf, long dcf
 	/* Close the file */
 	fclose(file_desc);
 	return TRUE;
+}
+
+void bin(unsigned n)
+{
+    unsigned i;
+    for (i = 1 << 19; i > 0; i = i / 2)
+        (n & i) ? printf("1") : printf("0");
 }
 
 static bool write_entries_file(table tab, char *filename, char *file_extension) {
@@ -147,11 +154,11 @@ bool write_external_file(table tab, char *filename, char *file_extension){
     if (tab == NULL) return TRUE;
 
     /* Write first line without \n to avoid extraneous line breaks */
-    fprintf(file_desc, "%s BASE %ld\n", tab->key, tab->base);
-    fprintf(file_desc, "%s OFFSET %ld\n", tab->key, tab->offset);
+    fprintf(file_desc, "%s BASE %ld\n", tab->key, tab->value);
+    fprintf(file_desc, "%s OFFSET %ld\n", tab->key, tab->value+1);
     while ((tab = tab->next) != NULL) {
-        fprintf(file_desc, "\n%s BASE %ld", tab->key, tab->base);
-        fprintf(file_desc, "\n%s OFFSET %ld", tab->key, tab->offset);
+        fprintf(file_desc, "\n%s BASE %ld", tab->key, tab->value);
+        fprintf(file_desc, "\n%s OFFSET %ld", tab->key, tab->value+1);
         fprintf(file_desc,"\n");
     }
     fclose(file_desc);

@@ -232,7 +232,14 @@ int encode_opdcode_wards(line_descriptor line, opcode line_opcode, funct line_fu
     if(line_opcode != RTS_OP && line_opcode != STOP_OP){
         (*operand_encode) = (operand_word*) better_malloc(sizeof (operand_word));
         (*operand_encode)->funct = line_funct;
+        (*operand_encode)->ARE= ABSOLUTE;
         (*operand_encode)->placeholder = 0;
+
+        /* Zeroing for good measure */
+        (*operand_encode)->destination_addressing = 0;
+        (*operand_encode)->destination_register = 0;
+        (*operand_encode)->source_addressing = 0;
+        (*operand_encode)->source_register = 0;
     }
     else{
         (*operand_encode) = NULL;

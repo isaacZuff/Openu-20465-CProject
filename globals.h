@@ -23,11 +23,21 @@ typedef enum enum_bool{
 
 #define REGISTER_PREFIX 'r'
 
-#define MAX_REGISTER 19
+#define MAX_REGISTER 15
 
 #define MACHINE_WORD_LENGTH 20
 
 /* Note: many enum declaration contains NONE_X value - which is a flag for not found during parsing. */
+
+typedef enum object_file_mask{
+    E_MASK = 15,
+    D_MASK = 240,
+    C_MASK = 3840,
+    B_MASK = 61440,
+    A_MASK = 983040
+
+} ob_file_mask;
+
 
 /** Operand addressing type */
 typedef enum addressing_types {
@@ -114,10 +124,6 @@ typedef enum registers {
     R13,
     R14,
     R15,
-    R16,
-    R17,
-    R18,
-    R19,
 	NONE_REGISTER = -1
 } reg;
 
