@@ -33,8 +33,8 @@ static bool process_code(line_descriptor line, int i, long *ic, machine_word **c
  * @param data_img The data image array
  * @return Whether succeeded.
  */
-bool process_line_fpass(line_descriptor line, long *IC, long *DC, machine_word **code_img, long *data_img,
-                        table *symbol_table) {
+bool process_line_first_pass(line_descriptor line, long *IC, long *DC, machine_word **code_img, long *data_img,
+                             table *symbol_table) {
 	int i, j;
 	char symbol[MAX_LABEL_LENGTH];
     bool is_symbol = FALSE;

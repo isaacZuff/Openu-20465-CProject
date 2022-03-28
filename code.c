@@ -17,14 +17,15 @@
  * @param ... The valid addressing types for first & second operand, respectively
  * @return Whether addressign types are valid
  */
+
 static bool validate_operand_addresing(line_descriptor line, addressing_type op1_addressing, addressing_type op2_addressing,
                                        int op1_valid_addr_count, int op2_valid_addr_count, ...);
 
 
-bool analyze_operands(line_descriptor line, int i, char **destination, int *operand_count) {
+bool analyze_operands(line_descriptor line, int i, char **operands_out, int *operand_count) {
 	int j;
 	*operand_count = 0;
-	destination[0] = destination[1] = NULL;
+    operands_out[0] = operands_out[1] = NULL;
 	SKIP_TO_NEXT_NON_WHITESPACE(line.content, i)
 	if (line.content[i] == ',') {
         fprintf_error_specific(line, "[ERROR] Unexpected comma after command.");
@@ -33,21 +34,22 @@ bool analyze_operands(line_descriptor line, int i, char **destination, int *oper
 
 	/* Until not too many operands (max of 2) and it's not the end of the line */
 	for (*operand_count = 0; line.content[i] != EOF && line.content[i] != '\n' && line.content[i];) {
-		if (*operand_count == 2) /* =We already got 2 operands in, We're going ot get the third! */ {
-            fprintf_error_specific(line, "[ERROR] Too many operands for operation (got >%d)", *operand_count);
-			free(destination[0]);
-			free(destination[1]);
+        /* Sanity check for 2 < operrands */
+        if (*operand_count == 2) {
+            fprintf_error_specific(line, "[ERROR] Operands number is bigger than 2");
+			free(operands_out[0]);
+			free(operands_out[1]);
 			return FALSE; /* an error occurred */
 		}
 
 		/* Allocate memory to save the operand */
-		destination[*operand_count] = better_malloc(MAX_LINE_LENGTH);
+		operands_out[*operand_count] = better_malloc(MAX_LINE_LENGTH);
 		/* as long as we're still on same operand */
 		for (j = 0; line.content[i] && line.content[i] != '\t' && line.content[i] != ' ' && line.content[i] != '\n' && line.content[i] != EOF &&
 		            line.content[i] != ','; i++, j++) {
-			destination[*operand_count][j] = line.content[i];
+            operands_out[*operand_count][j] = line.content[i];
 		}
-		destination[*operand_count][j] = '\0';
+        operands_out[*operand_count][j] = '\0';
 		(*operand_count)++; /* We've just saved another operand! */
 		SKIP_TO_NEXT_NON_WHITESPACE(line.content, i)
 
@@ -56,9 +58,9 @@ bool analyze_operands(line_descriptor line, int i, char **destination, int *oper
 			/* After operand & after white chars there's something that isn't ',' or end of line.. */
             fprintf_error_specific(line, "[ERROR] Only whitespace and comma supposed to separate operands");
 			/* Release operands dynamically allocated memory */
-			free(destination[0]);
+			free(operands_out[0]);
 			if (*operand_count > 1) {
-				free(destination[1]);
+				free(operands_out[1]);
 			}
 			return FALSE;
 		}
@@ -71,9 +73,9 @@ bool analyze_operands(line_descriptor line, int i, char **destination, int *oper
 		else continue; /* No errors, continue */
 		{ /* Error found! (didn't continue) */
 			/* No one forgot you two! */
-			free(destination[0]);
+			free(operands_out[0]);
 			if (*operand_count > 1) {
-				free(destination[1]);
+				free(operands_out[1]);
 			}
 			return FALSE;
 		}
@@ -337,22 +339,28 @@ reg get_regular_register_by_name(char *name) {
 
 reg get_index_register_by_name(char *operand) {
 
-    int open_braces_index = index_of_char(operand, '[');
-    int closing_braces_index = index_of_char(operand, ']');
+    int open_braces_index,closing_braces_index;
+    char* operand_temp =better_malloc(MAX_LINE_LENGTH);
+    strcpy(operand_temp, operand);
+
+    open_braces_index = index_of_char(operand_temp, '[');
+    closing_braces_index = index_of_char(operand_temp, ']');
 
     /* test for ....[XX]<-- */
     if (open_braces_index != -1 && closing_braces_index !=-1){
-        char *register_str = operand+open_braces_index+1;
+        char *register_str = operand_temp+open_braces_index+1;
         reg reg_num;
-        operand[open_braces_index] = '\0'; /* separating to test only the label*/
-        operand[closing_braces_index] = '\0'; /* closing the second string */
+        operand_temp[open_braces_index] = '\0'; /* separating to test only the label*/
+        operand_temp[closing_braces_index] = '\0'; /* closing the second string */
         reg_num = get_regular_register_by_name(register_str);
 
 
-        if(is_valid_label_name(operand) && 10<=reg_num && reg_num <= 15 ){
+        if(is_valid_label_name(operand_temp) && 10<=reg_num && reg_num <= 15 ){
+            free(operand_temp);
             return reg_num;
         }
     }
+    free(operand_temp);
     return NONE_REGISTER; /* No match */
 }
 

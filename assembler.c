@@ -74,7 +74,7 @@ static bool process_file(char *filename) {
                 temp_c = fgetc(file_des);
             } while (temp_c != '\n' && temp_c != EOF);
         } else {
-            if (!process_line_fpass(current_line, &ic, &dc, code_img, data_img, &symbol_table)) {
+            if (!process_line_first_pass(current_line, &ic, &dc, code_img, data_img, &symbol_table)) {
                 if (success_flag) {
                     ICF = -1;
                     success_flag = FALSE;

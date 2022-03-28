@@ -137,8 +137,7 @@ bool add_symbol_to_machine_code(line_descriptor line, long *ic, machine_word **c
  * @param symbol_table The symbol table
  * @return Whether succeeded
  */
-int process_second_pass_operand(line_descriptor line, long *curr_ic, char *operand, machine_word **code_img,
-                                table *symbol_table) {
+int process_second_pass_operand(line_descriptor line, long *curr_ic, char *operand, machine_word **code_img, table *symbol_table) {
     addressing_type addr = get_addressing_type(operand);
     machine_word *machine_base_word, *machine_offset_word;
     /* We already handled immediate addressing, we can keep going */
@@ -147,19 +146,26 @@ int process_second_pass_operand(line_descriptor line, long *curr_ic, char *opera
     }
 
     if (DIRECT_ADDR == addr || INDEX_ADDR == addr) {
+        char* search_operand = operand;
+        if(INDEX_ADDR == addr){
+            search_operand = extract_index_addressing_label(operand);
+        }
         bool is_external = FALSE;
-        table_entry *entry = find_by_types(*symbol_table, operand, 3, DATA_SYMBOL, CODE_SYMBOL, EXTERNAL_SYMBOL);
-        /* operand++;  NOT NEEDED?? */
+        table_entry *entry = find_by_types(*symbol_table, search_operand, 3, DATA_SYMBOL, CODE_SYMBOL, EXTERNAL_SYMBOL);
+
+        if(INDEX_ADDR == addr){
+            free(search_operand);
+        }
 
         if (entry == NULL) {
-            fprintf_error_specific(line, "[ERROR] Cant find symbol %s in second pass", operand);
+            fprintf_error_specific(line, "[ERROR] Cant find symbol %s in second pass", search_operand);
             return FALSE;
 
         }
 
         if (entry->type == EXTERNAL_SYMBOL) {
             is_external = TRUE;
-            add_table_item(symbol_table, operand, (*curr_ic) + 2, EXTERNAL_REFERENCE);
+            add_table_item(symbol_table, operand, (*curr_ic) + 1, EXTERNAL_REFERENCE);
         }
 
         machine_base_word = (machine_word *) better_malloc(sizeof(machine_word));

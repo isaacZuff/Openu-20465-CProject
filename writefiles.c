@@ -54,7 +54,7 @@ int write_output_files(machine_word **code_img, long *data_img, long icf, long d
 static bool write_ob(machine_word **code_img, long *data_img, long icf, long dcf, char *filename) {
 	int i;
     long val=0;
-
+    int a,b,c,d,e;
 	FILE *file_desc;
 	/* add extension of file to open */
 	char *output_filename = strcat_to_new(filename, ".ob");
@@ -73,7 +73,7 @@ static bool write_ob(machine_word **code_img, long *data_img, long icf, long dcf
 
 	/* starting from index 0, not IC_INIT_VALUE as icf, so we have to subtract it. */
 	for (i = 0; i < icf - IC_INIT_VALUE; i++) {
-        int a,b,c,d,e;
+
         /* Only first opcode wards contain length field */
         if (code_img[i]->length > 0) {
 
@@ -95,12 +95,16 @@ static bool write_ob(machine_word **code_img, long *data_img, long icf, long dcf
         fprintf(file_desc,"%04d A%x-B%x-C%x-D%x-E%x\n", IC_INIT_VALUE +i ,a,b,c,d,e);
     }
 
-	/* Write data2 image. dcf starts at 0 so it's fine */
+	/* Write data2 image. */
 	for (i = 0; i < dcf; i++) {
-		/* print only lower 24 bytes */
-		val = KEEP_ONLY_24_LSB(data_img[i]);
-		/* print at least 6 digits of hex, and 7 digits of dc */
-		fprintf(file_desc, "\n%.7ld %.6lx", icf + i, val);
+
+		val = data_img[i] | 1<<(ABSOLUTE+16);
+        e = val & E_MASK;
+        d = (val & D_MASK)>>4;
+        c = (val & C_MASK)>>8;
+        b = (val & B_MASK)>>12;
+        a = 4; /* It's always 4 because its only data */
+        fprintf(file_desc,"%04ld A%x-B%x-C%x-D%x-E%x\n", icf +i ,a,b,c,d,e);
 	}
 
 	/* Close the file */

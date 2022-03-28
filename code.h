@@ -65,14 +65,14 @@ reg get_register_by_name_and_addressing(char *name, addressing_type addr_type);
 operand_data_word * encode_operand_data(addressing_type addressing, int data, bool external_symbol);
 
 /**
- * Separates the operands from a certain index, puts each operand into the destination array,
+ * Separates the operands from a certain index, puts each operand into the operands_out array,
  * and puts the found operand count in operand count argument
  * @param line The command text
  * @param i The index to start analyzing from
- * @param destination At least a 2-cell buffer of strings for the extracted operand strings
- * @param operand_count The destination of the detected operands count
+ * @param operands_out At least a 2-cell buffer of strings for the extracted operand strings
+ * @param operand_count The operands_out of the detected operands count
  * @return Whether analyzing succeeded
  */
-bool analyze_operands(line_descriptor line, int i, char **destination, int *operand_count);
+bool analyze_operands(line_descriptor line, int i, char **operands_out, int *operand_count);
 
 #endif

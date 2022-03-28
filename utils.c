@@ -82,6 +82,22 @@ bool find_instruction_label(char* content, char *symbol_buff) {
 }
 
 /***
+ * Takes the register out of the label
+ * @param full_label
+ * @return label without register and braces
+ */
+char *extract_index_addressing_label(char* full_label){
+    char *short_label = better_malloc(sizeof (MAX_LABEL_LENGTH));
+    int i, open_braces_index = index_of_char(full_label, '[');
+
+    for(i=0; i<open_braces_index;i++) {
+        short_label[i] = full_label[i];
+    }
+    short_label[i] = '\0';
+    return short_label;
+}
+
+/***
  * Finds index of char in a given string
  * @param string string to search in
  * @param c char to find
@@ -219,7 +235,9 @@ void free_code_image(machine_word **code_image, long fic) {
 			/* free code/data word */
 			if (curr_word->length > 0) {
 				free(curr_word->word.code);
-			} else {
+			} else if(curr_word->is_operand== TRUE){
+                free(curr_word->word.operand);
+            } else {
 				free(curr_word->word.data2);
 			}
 			/* free the pointer to the union */

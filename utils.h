@@ -35,6 +35,13 @@ bool find_and_validate_label(line_descriptor line, char *symbol_buff);
 bool find_instruction_label(char* content, char *symbol_buff);
 
 /***
+ * Takes the register out of the label
+ * @param full_label
+ * @return label without register and braces
+ */
+char *extract_index_addressing_label(char* full_label);
+
+/***
  * Finds index of char in a given string
  * @param string string to search in
  * @param c char to find
