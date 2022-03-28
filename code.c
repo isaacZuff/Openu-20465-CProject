@@ -128,8 +128,6 @@ void get_opcode_func(char *cmd, opcode *opcode_out, funct *funct_out) {
 }
 
 addressing_type get_addressing_type(char *operand) {
-    int open_braces_index;
-    int closing_braces_index;
     /* if nothing, just return none */
 	if (operand[0] == '\0'){
         return NONE_ADDR;

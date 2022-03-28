@@ -1,5 +1,4 @@
 #include <stdlib.h>
-#include <stdio.h>
 #include <string.h>
 #include <stdarg.h>
 #include "table.h"
@@ -69,7 +68,7 @@ void update_symbol_table_value(table tab, long to_add, symbol_type type) {
 
 table filter_table_by_type(table tab, symbol_type type) {
 	table new_table = NULL;
-	/* For each entry, check if has the type. if so, insert to the new table. */
+	/* Insert to the new table entries with the corresponding type */
 	do {
 		if (tab->type == type) {
 			add_table_item(&new_table, tab->key, tab->value, tab->type);
@@ -86,12 +85,12 @@ table_entry *find_by_types(table table_entry, char *key, int symbol_count, ...) 
     }
 	symbol_type *valid_symbol_types = better_malloc((symbol_count) * sizeof(int));
 	/* Build a list of the valid types */
-	va_list arglist;
-	va_start(arglist, symbol_count);
+	va_list arg_list;
+	va_start(arg_list, symbol_count);
 	for (i = 0; i < symbol_count; i++) {
-		valid_symbol_types[i] = va_arg(arglist, symbol_type);
+		valid_symbol_types[i] = va_arg(arg_list, symbol_type);
 	}
-	va_end(arglist);
+	va_end(arg_list);
 
 	/* Iterate over the table and return the table_entry if found */
 	do {

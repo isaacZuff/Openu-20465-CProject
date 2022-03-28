@@ -37,7 +37,7 @@ static bool process_file(char *filename) {
     long ic = IC_INIT_VALUE, dc = 0, ICF, DCF;
     bool success_flag = TRUE; /* is succeeded so far */
     char *filename_with_ext;
-    char temp_line[MAX_LINE_LENGTH + 2]; /* temporary string for storing line, read from file */
+    char temp_line[MAX_LINE_LENGTH + 2]; /* used for line reading */
     FILE *file_des; /* Current assembly file descriptor to process */
     long data_img[CODE_ARR_IMG_LENGTH]; /* Contains an image of the machine code */
     machine_word *code_img[CODE_ARR_IMG_LENGTH];

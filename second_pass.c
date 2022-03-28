@@ -58,7 +58,7 @@ bool process_line_second_pass(line_descriptor line, long *ic, machine_word **cod
 						return FALSE;
 					}
 					/* otherwise, print more general error */
-                    fprintf_error_specific(line, "Cant find symbol in the data/code tables");
+                    fprintf_error_specific(line, "[ERROR] Cant find symbol in the data/code table %s",symbol);
 					return FALSE;
 				}
 				add_table_item(symbol_table, symbol, entry->value, ENTRY_SYMBOL);

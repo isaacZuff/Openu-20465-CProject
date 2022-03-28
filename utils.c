@@ -87,7 +87,7 @@ bool find_instruction_label(char* content, char *symbol_buff) {
  * @return label without register and braces
  */
 char *extract_index_addressing_label(char* full_label){
-    char *short_label = better_malloc(sizeof (MAX_LABEL_LENGTH));
+    char *short_label = better_malloc(MAX_LABEL_LENGTH);
     int i, open_braces_index = index_of_char(full_label, '[');
 
     for(i=0; i<open_braces_index;i++) {
