@@ -226,15 +226,14 @@ int printf_error(char *message, ...) { /* Prints the errors into a file, defined
     return result;
 }
 
-void free_code_image(machine_word **code_image, long fic) {
+void free_code_image(machine_word **code_image, long icf) {
 	long i;
-	/* for each not-null cell (we might have some "holes", so we won't stop on first null) */
-	for (i = 0; i < fic; i++) {
+	for (i = 0; i < icf; i++) {
 		machine_word *curr_word = code_image[i];
 		if (curr_word != NULL) {
 			/* free code/data word */
 			if (curr_word->length > 0) {
-				free(curr_word->word.code);
+				free(curr_word->word.opcode);
 			} else if(curr_word->is_operand== TRUE){
                 free(curr_word->word.operand);
             } else {

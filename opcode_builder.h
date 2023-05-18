@@ -29,8 +29,8 @@ addressing_type get_addressing_type(char *operand);
  * @param operand_encode struct of the operand word OUTPUT
  * @return Number of words to add(L from step 13 first pass) else 0
  */
-int encode_opdcode_wards(line_descriptor line, opcode line_opcode, funct line_funct, int op_count, char *operands[2],
-                         opcode_word** opcode_encode, operand_word** operand_encode);
+int encode_opcode_wards(line_descriptor line, opcode line_opcode, funct line_funct, int op_count, char *operands[2],
+                        opcode_word** opcode_encode, operand_word** operand_encode);
 
 /**
  * Returns the register enum value by it's name

@@ -3,7 +3,7 @@
 #ifndef _GLOBALS_H
 #define _GLOBALS_H
 
-/** Boolean (t/f) definition */
+/** 1 and 0 for T/F isn't clear */
 typedef enum enum_bool{
 	FALSE,
     TRUE
@@ -27,7 +27,6 @@ typedef enum enum_bool{
 
 #define MACHINE_WORD_LENGTH 20
 
-/* Note: many enum declaration contains NONE_X value - which is a flag for not found during parsing. */
 
 typedef enum object_file_mask{
     E_MASK = 15,
@@ -132,17 +131,6 @@ typedef enum are_options {
     RELOCATABLE,
     ABSOLUTE
 } are;
-/** Represents a single code word */
-typedef struct REPLACE {
-    unsigned int destination_addressing: 2;
-    unsigned int destination_register: 4;
-    unsigned int source_addressing: 2;
-    unsigned int source_register: 4;
-    unsigned int funct: 4;
-    unsigned int ARE: 3;
-    unsigned int placeholder: 1;
-
-} REPLACE;
 
 typedef struct operand_code_ward_options {
     unsigned int destination_addressing: 2;
@@ -162,16 +150,9 @@ typedef struct opcode_word {
 
 } opcode_word;
 
-/** Represents a single data word. */
-typedef struct data_word {
-	unsigned int ARE: 3;
-	/* The data content itself (a method for putting data into these field is defined) */
-	unsigned long data;
-} data_word;
-
 typedef struct operand_data_word {
     unsigned int ARE: 3;
-    /* The data content itself (a method for putting data into these field is defined) */
+    /* from bit 0 to bit 15 */
     unsigned int data:16;
     unsigned int placeholder: 1;
 } operand_data_word;
@@ -181,17 +162,15 @@ typedef struct machine_word {
 	/* if it represents code (not additional data), this field contains the total length required by the code. if it's data, this field is 0. */
 	long length;
     bool is_operand;
-	/* The content can be code or data */
+	/* Union to save memory when allocating the object*/
 	union word {
-		data_word *data;
         operand_data_word *data2;
         opcode_word* opcode;
         operand_word* operand;
-		REPLACE *code;
 	} word;
 } machine_word;
 
-/** Instruction type (.data, .entry, etc.) */
+/** Instruction types enum */
 typedef enum instruction {
 	/** .data instruction */
 	DATA_INST,
@@ -208,14 +187,14 @@ typedef enum instruction {
 } instruction;
 
 /**
- * Represents a single source line, including it's details
+ * A metadata + data object about the line we are working with
  */
-typedef struct line_info {
-	/** Line number in file */
+typedef struct line_descriptor {
+	/**  */
 	long line_number;
 	/** File name */
-	char *file_name;
-	/** Line content (source) */
+	char *full_file_name;
+	/** Raw content of the line */
 	char *content;
 } line_descriptor;
 

@@ -28,7 +28,6 @@ instruction parse_instruction_from_index(line_descriptor line, int *index) {
 /* Instruction line processing helper functions */
 
 bool process_string_instruction(line_descriptor line, int index, long *data_img, long *dc) {
-	char temp_str[MAX_LINE_LENGTH];
     char *last_quote_location = strrchr(line.content, '"'); /* str*r*char finds last occurrence*/
     int last_char_index = (last_quote_location-line.content)+1;
     SKIP_TO_NEXT_NON_WHITESPACE(line.content,last_char_index)

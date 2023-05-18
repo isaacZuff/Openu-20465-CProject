@@ -13,7 +13,7 @@
  * @param filename The filename (without the extension)
  * @param ent_table The entries table
  * @param ext_table The external references table
- * @return Whether succeeded
+ * @return True if good False if bad
  */
 int write_output_files(machine_word **code_img, long *data_img, long icf, long dcf, char *filename,
                        table symbol_table);

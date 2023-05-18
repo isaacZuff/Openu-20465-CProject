@@ -1,15 +1,7 @@
 #include <stdio.h>
-#include <string.h>
 #include <stdlib.h>
 #include "utils.h"
 #include "table.h"
-
-#define KEEP_ONLY_24_LSB(value) ((value) & 0xFFFFFF)
-/**
- * "Cuts" the msb of the value, keeping only it's lowest 21 bits
- * 0b00000000000111111111111111111111 = 0x1FFFFF
- */
-#define KEEP_ONLY_21_LSB(value) ((value) & 0x1FFFFF)
 
 /**
  * Writes the code and data2 image into an .ob file, with lengths on top
@@ -33,27 +25,25 @@ static bool write_entries_file(table tab, char *filename, char *file_extension);
 
 bool write_external_file(table tab, char *filename, char *file_extension);
 
-void bin(unsigned n);
-
 int write_output_files(machine_word **code_img, long *data_img, long icf, long dcf, char *filename,
                        table symbol_table) {
-	bool result;
+	bool success_flag;
 	table externals = filter_table_by_type(symbol_table, EXTERNAL_REFERENCE);
 	table entries = filter_table_by_type(symbol_table, ENTRY_SYMBOL);
 	/* Write .ob file */
-	result = write_ob(code_img, data_img, icf, dcf, filename) &&
+    success_flag = write_ob(code_img, data_img, icf, dcf, filename) &&
 	         /* Write *.ent and *.ext files: call with symbols from external references type or entry type only */
              write_external_file(externals, filename, ".ext") &&
-            write_entries_file(entries, filename, ".ent");
+                   write_entries_file(entries, filename, ".ent");
 	/* Release filtered tables */
 	free_table(externals);
 	free_table(entries);
-	return result;
+	return success_flag;
 }
 
 static bool write_ob(machine_word **code_img, long *data_img, long icf, long dcf, char *filename) {
 	int i;
-    long val=0;
+    long val;
     int a,b,c,d,e;
 	FILE *file_desc;
 	/* add extension of file to open */
@@ -110,13 +100,6 @@ static bool write_ob(machine_word **code_img, long *data_img, long icf, long dcf
 	/* Close the file */
 	fclose(file_desc);
 	return TRUE;
-}
-
-void bin(unsigned n)
-{
-    unsigned i;
-    for (i = 1 << 19; i > 0; i = i / 2)
-        (n & i) ? printf("1") : printf("0");
 }
 
 static bool write_entries_file(table tab, char *filename, char *file_extension) {

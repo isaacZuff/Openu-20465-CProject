@@ -15,11 +15,11 @@
  * @param op1_valid_addr_count The count of valid addressing types for the first operand
  * @param op2_valid_addr_count The count of valid addressing types for the first operand
  * @param ... The valid addressing types for first & second operand, respectively
- * @return Whether addressign types are valid
+ * @return Whether addressing types are valid
  */
 
-static bool validate_operand_addresing(line_descriptor line, addressing_type op1_addressing, addressing_type op2_addressing,
-                                       int op1_valid_addr_count, int op2_valid_addr_count, ...);
+static bool validate_operand_addressing(line_descriptor line, addressing_type op1_addressing, addressing_type op2_addressing,
+                                        int op1_valid_addr_count, int op2_valid_addr_count, ...);
 
 
 bool analyze_operands(line_descriptor line, int i, char **operands_out, int *operand_count) {
@@ -34,7 +34,7 @@ bool analyze_operands(line_descriptor line, int i, char **operands_out, int *ope
 
 	/* Until not too many operands (max of 2) and it's not the end of the line */
 	for (*operand_count = 0; line.content[i] != EOF && line.content[i] != '\n' && line.content[i];) {
-        /* Sanity check for 2 < operrands */
+        /* Sanity check for 2 < operands */
         if (*operand_count == 2) {
             fprintf_error_specific(line, "[ERROR] Operands number is bigger than 2");
 			free(operands_out[0]);
@@ -173,18 +173,18 @@ bool validate_opcode_operands(line_descriptor line, addressing_type first_addres
 		}
 		/* validate operand addressing */
 		if (curr_opcode == CMP_OP) {
-			return validate_operand_addresing(line, first_addressing, second_addressing, 4, 4,
-                                              IMMEDIATE_ADDR, DIRECT_ADDR, INDEX_ADDR, REGISTER_ADDR,
-                                              IMMEDIATE_ADDR, DIRECT_ADDR, INDEX_ADDR, REGISTER_ADDR);
+			return validate_operand_addressing(line, first_addressing, second_addressing, 4, 4,
+                                               IMMEDIATE_ADDR, DIRECT_ADDR, INDEX_ADDR, REGISTER_ADDR,
+                                               IMMEDIATE_ADDR, DIRECT_ADDR, INDEX_ADDR, REGISTER_ADDR);
 		} else if (curr_opcode == MOV_OP || curr_opcode == SUB_OP) { /* ADD == SUB */
-			return validate_operand_addresing(line, first_addressing, second_addressing, 4, 3,
-                                              IMMEDIATE_ADDR, DIRECT_ADDR, INDEX_ADDR, REGISTER_ADDR,
-                                              DIRECT_ADDR, INDEX_ADDR, REGISTER_ADDR);
+			return validate_operand_addressing(line, first_addressing, second_addressing, 4, 3,
+                                               IMMEDIATE_ADDR, DIRECT_ADDR, INDEX_ADDR, REGISTER_ADDR,
+                                               DIRECT_ADDR, INDEX_ADDR, REGISTER_ADDR);
 		} else if (curr_opcode == LEA_OP) {
 
-			return validate_operand_addresing(line, first_addressing, second_addressing, 2, 3,
-                                              DIRECT_ADDR, INDEX_ADDR,
-                                              DIRECT_ADDR, INDEX_ADDR, REGISTER_ADDR);
+			return validate_operand_addressing(line, first_addressing, second_addressing, 2, 3,
+                                               DIRECT_ADDR, INDEX_ADDR,
+                                               DIRECT_ADDR, INDEX_ADDR, REGISTER_ADDR);
 		}
 	} else if (CLR_OP <= curr_opcode  && curr_opcode <= PRN_OP) {
 		/* Following opcodes specify usage of single parameter */
@@ -194,13 +194,13 @@ bool validate_opcode_operands(line_descriptor line, addressing_type first_addres
 		}
 		/* validate operand addressing */
 		if (curr_opcode ==  INC_OP || curr_opcode == RED_OP) { /* NOT == INC == CLR == DEC */
-			return validate_operand_addresing(line, first_addressing, NONE_ADDR, 3, 0, DIRECT_ADDR, INDEX_ADDR,
-                                              REGISTER_ADDR);
+			return validate_operand_addressing(line, first_addressing, NONE_ADDR, 3, 0, DIRECT_ADDR, INDEX_ADDR,
+                                               REGISTER_ADDR);
 		} else if (curr_opcode == BNE_OP) { /* BNE == JSR == JMP */
-			return validate_operand_addresing(line, first_addressing, NONE_ADDR, 2, 0, DIRECT_ADDR, INDEX_ADDR);
+			return validate_operand_addressing(line, first_addressing, NONE_ADDR, 2, 0, DIRECT_ADDR, INDEX_ADDR);
 		} else /* if (curr_opcode == PRN_OP) */ {
-			return validate_operand_addresing(line, first_addressing, NONE_ADDR, 4, 0, IMMEDIATE_ADDR, DIRECT_ADDR,
-                                              INDEX_ADDR, REGISTER_ADDR);
+			return validate_operand_addressing(line, first_addressing, NONE_ADDR, 4, 0, IMMEDIATE_ADDR, DIRECT_ADDR,
+                                               INDEX_ADDR, REGISTER_ADDR);
 		}
 	} else if (curr_opcode <= STOP_OP && curr_opcode >= RTS_OP) {
 		/* 0 operands exactly */
@@ -213,8 +213,8 @@ bool validate_opcode_operands(line_descriptor line, addressing_type first_addres
 }
 
 
-int encode_opdcode_wards(line_descriptor line, opcode line_opcode, funct line_funct, int op_count, char *operands[2],
-                         opcode_word** opcode_encode, operand_word** operand_encode) {
+int encode_opcode_wards(line_descriptor line, opcode line_opcode, funct line_funct, int op_count, char *operands[2],
+                        opcode_word** opcode_encode, operand_word** operand_encode) {
 	/* Get addressing types and validate them: */
 	addressing_type first_addressing = op_count >= 1 ? get_addressing_type(operands[0]) : NONE_ADDR;
 	addressing_type second_addressing = op_count == 2 ? get_addressing_type(operands[1]) : NONE_ADDR;
@@ -267,8 +267,8 @@ int encode_opdcode_wards(line_descriptor line, opcode line_opcode, funct line_fu
 	return 2;
 }
 
-static bool validate_operand_addresing(line_descriptor line, addressing_type op1_addressing, addressing_type op2_addressing, int op1_valid_addr_count,
-                                       int op2_valid_addr_count, ...) {
+static bool validate_operand_addressing(line_descriptor line, addressing_type op1_addressing, addressing_type op2_addressing, int op1_valid_addr_count,
+                                        int op2_valid_addr_count, ...) {
 	int i;
 	bool is_valid;
 	va_list list;
@@ -291,8 +291,6 @@ static bool validate_operand_addresing(line_descriptor line, addressing_type op1
 
 	va_end(list);
 
-	/* Check if addressing we got is an allowed one */
-	is_valid = op1_valid_addr_count == 0 && op1_addressing == NONE_ADDR;
 	for (i = 0; i < op1_valid_addr_count && !is_valid; i++) {
 		if (op1_valids[i] == op1_addressing) {
 			is_valid = TRUE;
@@ -302,7 +300,7 @@ static bool validate_operand_addresing(line_descriptor line, addressing_type op1
         fprintf_error_specific(line, "[ERROR] Wrong addressing for the 1st operand");
 		return FALSE;
 	}
-	/* Same */
+	/* code reuse unnecessary but w/e*/
 	is_valid = op2_valid_addr_count == 0 && op2_addressing == NONE_ADDR;
 	for (i = 0; i < op2_valid_addr_count && !is_valid; i++) {
 		if (op2_valids[i] == op2_addressing) {
@@ -369,24 +367,6 @@ reg get_register_by_name_and_addressing(char *name, addressing_type addr_type){
     return get_regular_register_by_name(name);
 }
 
-
-data_word *encode_operand_data_old(addressing_type addressing, long data, bool is_extern_symbol) {
-	signed long mask; /* For bitwise operations for data conversion */
-	unsigned long ARE = 4, mask_un; /* 4 = 2^2 = 1 << 2 */
-	data_word *dataword = better_malloc(sizeof(data_word));
-
-	if (addressing == DIRECT_ADDR) {
-		ARE = is_extern_symbol ? 1 : 2;
-	}
-	dataword->ARE = ARE; /* Set ARE field value */
-
-	/* Now all left is to encode the data */
-	mask = -1;
-	mask_un = mask; /* both hold 11...11 */
-	mask_un >>= 11; /* Now mask_un holds 0..001111....111, 11 zeros and 21 ones */
-	dataword->data = mask_un & data; /* Now just the 21 lsb bits area left and assigned to data field. */
-	return dataword;
-}
 
 operand_data_word * encode_operand_data(addressing_type addressing, int data, bool external_symbol) {
     operand_data_word *operand_data_temp = (operand_data_word*)better_malloc(sizeof(operand_data_word));

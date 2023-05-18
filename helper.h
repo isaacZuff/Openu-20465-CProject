@@ -114,8 +114,8 @@ int printf_error(char *message, ...);
 /**
  * Frees all the dynamically-allocated memory for the code image.
  * @param code_image ABSOLUTE pointer to the code images buffer
- * @param fic The final instruction counter value
+ * @param icf The final instruction counter value
  */
-void free_code_image(machine_word **code_image, long fic);
+void free_code_image(machine_word **code_image, long icf);
 
 #endif
