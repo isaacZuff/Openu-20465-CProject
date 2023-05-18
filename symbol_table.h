@@ -1,8 +1,10 @@
-/* Implements a dynamically-allocated symbol table */
-#ifndef _TABLE_H
-#define _TABLE_H
 
-/** ABSOLUTE symbol type */
+#ifndef _SYMBOL_TABLE_H
+#define _SYMBOL_TABLE_H
+
+/* Implements a dynamically-allocated symbol table */
+
+/** symbol type enum */
 typedef enum symbol_type {
 	CODE_SYMBOL,
 	DATA_SYMBOL,

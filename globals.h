@@ -9,8 +9,10 @@ typedef enum enum_bool{
     TRUE
 } bool;
 
-/** Maximum size of code image and data2 image */
-#define CODE_ARR_IMG_LENGTH 1200
+/** Maximum size of code image and data image */
+/* Allowed using constant size in mmn14 specification */
+/* Yakir specified 8192 is good https://opal.openu.ac.il/mod/ouilforum/discuss.php?d=2996326&p=7146471#p7146471 */
+#define CODE_ARR_IMG_LENGTH 8192
 
 /** Maximum length of a single source line  */
 #define MAX_LINE_LENGTH 80
@@ -25,7 +27,24 @@ typedef enum enum_bool{
 
 #define MAX_REGISTER 15
 
+#define POST_MARCO_SUFFIX ".am"
+
+#define PRE_MARCO_SUFFIX ".as"
+
 #define MACHINE_WORD_LENGTH 20
+
+#define MAX_MACRO_SIZE 4800 /* 80*6 Defined in mmn14 80 chars * 6 lines  */
+
+typedef struct simple_node {
+    char* data;
+    struct simple_node* next;
+} simple_node;
+
+typedef struct list_node {
+    char* data;
+    struct list_node* next;
+    simple_node* macro_lines;
+} list_node;
 
 
 typedef enum object_file_mask{

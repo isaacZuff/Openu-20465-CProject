@@ -1,6 +1,6 @@
 /* Contains general-purposed functions, for both passes and many usages */
-#ifndef _UTILS_H
-#define _UTILS_H
+#ifndef _HELPER_H
+#define _HELPER_H
 
 #include "globals.h"
 
@@ -24,6 +24,13 @@ char *strcat_to_new(char *first_str, char* second_str);
  * @return False if label not found or found and valid else True
  */
 bool find_and_validate_label(line_descriptor line, char *symbol_buff);
+
+/***
+ * Gets the first field in the line
+ * @param line_string
+ * @return Index of the first char after the field or -1 if not found
+ */
+int get_first_field(const char* line_string,char* field);
 
 /**
  * Finds the defined label in the code if exists, and saves it into the buffer.
@@ -50,11 +57,11 @@ char *extract_index_addressing_label(char* full_label);
 int index_of_char(char* string, int c);
 
 /**
- * Returns the instruction enum by the instruction's name, without the opening '.'
- * @param name The instruction name, without the '.'
- * @return The instruction enum if found, NONE_INST if not found.
+ * Gets instruction enum member
+ * @param instruction_str Instruction instruction_str without the dot prefix
+ * @return Relevant instruction enum member if exists else NOT_FOUND enum
  */
-instruction find_instruction_by_name(char *name);
+instruction get_instruction_by_name(char *instruction_str);
 
 /**
  * Tests whether a string is a collection of digits only

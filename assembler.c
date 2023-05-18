@@ -1,20 +1,22 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
-#include "writefiles.h"
-#include "utils.h"
+#include "output_module.h"
+#include "helper.h"
 #include "first_pass.h"
 #include "second_pass.h"
+#include "pre_assembler.h"
+
 
 /**
- * Processes a single assembly source file, and returns the result status.
- * @param filename The filename, without it's extension
- * @return Whether succeeded
+ * Full Processing of .as file
+ * @param filename The filename as directed in mmn14
+ * @return True if good False if bad
  */
 static bool process_file(char *filename);
 
 /**
- * Entry point - 24bit assembler. Assembly language specified in booklet.
+ * Main of the program
  */
 int main(int argc, char *argv[]) {
 	int i;
@@ -25,6 +27,8 @@ int main(int argc, char *argv[]) {
 		/* if last process failed and there's another file, break line: */
 		if (!succeeded) puts("");
 		/* foreach argument (file name), send it for full processing. */
+        expand_macros(argv[i]);
+
 		succeeded = process_file(argv[i]);
 		/* Line break if failed */
 	}
@@ -45,10 +49,10 @@ static bool process_file(char *filename) {
     table symbol_table = NULL;
     line_descriptor current_line;
 
-    /* Concat extensionless filename with .as extension */
-    filename_with_ext = strcat_to_new(filename, ".as");
+    /* Concat extensionless filename with POST_MARCO_SUFFIX extension */
+    filename_with_ext = strcat_to_new(filename, POST_MARCO_SUFFIX);
 
-    /* Open file, skip on failure */
+    /* Try to open file, if something wrong skip */
     if ((file_des = fopen(filename_with_ext, "r")) == NULL) {
         /* if file couldn't be opened, write to stderr. */
         printf_error("[ERROR] Unable to read file: %s\n", filename);
@@ -57,11 +61,12 @@ static bool process_file(char *filename) {
     }
 
     /* start first pass: */
-    current_line.file_name = filename_with_ext;
+    current_line.full_file_name = filename_with_ext;
     current_line.content = temp_line; /* We use temp_line to read from the file, but it stays at same location. */
     /* Read line - stop if read failed (when NULL returned) - usually when EOF. increase line counter for error printing. */
     for (current_line.line_number = 1;
-         fgets(temp_line, MAX_LINE_LENGTH + 2, file_des) != NULL; current_line.line_number++) {
+         fgets(temp_line, MAX_LINE_LENGTH + 2, file_des) != NULL;
+         current_line.line_number++) {
         /* if line too long, the buffer doesn't include the '\n' char OR the file isn't on end. */
         if (strchr(temp_line, '\n') == NULL && !feof(file_des)) {
             /* Print message and prevent further line processing, as well as second pass.  */
@@ -116,12 +121,9 @@ static bool process_file(char *filename) {
         }
     }
 
-    /* Now let's free some pointer: */
-    /* current file name */
+    /* CLEANUP Time */
     free(filename_with_ext);
-    /* Free symbol table */
     free_table(symbol_table);
-    /* Free code & data buffer contents */
     free_code_image(code_img, ICF);
 
     return success_flag;

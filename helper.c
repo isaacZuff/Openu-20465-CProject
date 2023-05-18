@@ -3,8 +3,8 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdarg.h>
-#include "utils.h"
-#include "code.h" /* for checking reserved words */
+#include "helper.h"
+#include "opcode_builder.h" /* for checking reserved words */
 
 #define STDERR_FILE stdout /* we should print to stderr but w/e */
 
@@ -48,6 +48,26 @@ bool find_and_validate_label(line_descriptor line, char *symbol_buff) {
 	}
     symbol_buff[0] = '\0';
 	return FALSE; /* Symbol not found */
+}
+
+/***
+ * Gets the first field in the line
+ * @param line_string
+ * @return Index of the first char after the field or -1 if not found
+ */
+int get_first_field(const char* line_string,char* field){
+    int i=0,j=0;
+    SKIP_TO_NEXT_NON_WHITESPACE(line_string,i);
+    for (; line_string[i] && line_string[i] != '\n' && line_string[i] != EOF && line_string[i] != ' ' && i <= MAX_LINE_LENGTH; i++) {
+        field[j] = line_string[i];
+        j++;
+    }
+    field[j] = '\0';
+
+    if(field[0] == '\0'){
+        return -1;
+    }
+    return j;
 }
 
 /**
@@ -127,10 +147,10 @@ static struct instruction_lookup_item
 		{NULL, NONE_INST}
 };
 
-instruction find_instruction_by_name(char *name) {
+instruction get_instruction_by_name(char *instruction_str) {
 	struct instruction_lookup_item *curr_item;
 	for (curr_item = instructions_lookup_table; curr_item->name != NULL; curr_item++) {
-		if (strcmp(curr_item->name, name) == 0) {
+		if (strcmp(curr_item->name, instruction_str) == 0) {
 			return curr_item->value;
 		}
 	}
@@ -194,7 +214,8 @@ bool is_reserved_word(char *name) {
 	int fun, opc;
 	/* check if register or command */
 	get_opcode_func(name, &opc, (funct *) &fun);
-	if (opc != DEFAULT_OP || get_regular_register_by_name(name) != NONE_REGISTER || find_instruction_by_name(name) != NONE_INST) return TRUE;
+	if (opc != DEFAULT_OP || get_regular_register_by_name(name) != NONE_REGISTER ||
+            get_instruction_by_name(name) != NONE_INST) return TRUE;
 
 	return FALSE;
 }
@@ -202,7 +223,7 @@ bool is_reserved_word(char *name) {
 int fprintf_error_specific(line_descriptor line, char *message, ...) { /* Prints the errors into a file, defined above as macro */
 	int result;
 	va_list args;
-	fprintf(STDERR_FILE, "Error In %s:%ld: ", line.file_name, line.line_number);
+	fprintf(STDERR_FILE, "Error In %s:%ld: ", line.full_file_name, line.line_number);
 
 	va_start(args, message);
 	result = vfprintf(STDERR_FILE, message, args);

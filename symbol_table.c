@@ -1,8 +1,8 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdarg.h>
-#include "table.h"
-#include "utils.h"
+#include "symbol_table.h"
+#include "helper.h"
 
 /* Table data structure based on sorted linked list */
 

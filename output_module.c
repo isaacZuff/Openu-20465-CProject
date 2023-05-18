@@ -1,7 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include "utils.h"
-#include "table.h"
+#include "helper.h"
+#include "symbol_table.h"
+#include "linkedlist.h"
 
 /**
  * Writes the code and data2 image into an .ob file, with lengths on top
@@ -114,7 +115,7 @@ static bool write_entries_file(table tab, char *filename, char *file_extension) 
 		return FALSE;
 	}
     free(full_filename);
-	/* if table is null, nothing to write */
+	/* stop if empty */
 	if (tab == NULL) return TRUE;
 
 	/* Write first line without \n to avoid extraneous line breaks */
@@ -152,3 +153,28 @@ bool write_external_file(table tab, char *filename, char *file_extension){
     fclose(file_desc);
     return TRUE;
 }
+
+void write_macro_file(simple_node* lines_to_write, char* filename){
+    FILE *file_desc;
+    simple_node* output_lines = lines_to_write;
+    /* concatenate filename & extension, and open the file for writing: */
+    char *full_filename = strcat_to_new(filename, POST_MARCO_SUFFIX);
+    file_desc = fopen(full_filename, "w");
+    /* if failed, print error and exit */
+    if (file_desc == NULL) {
+        printf("Can't create or rewrite to file %s.", full_filename);
+        free(full_filename);
+        return;
+    }
+    free(full_filename);
+    /* stop if empty */
+    if (lines_to_write == NULL) return;
+
+    /* Write first line without \n to avoid extraneous line breaks */
+    while (output_lines != NULL) {
+        fprintf(file_desc, "%s",output_lines->data );
+        output_lines = output_lines->next;
+    }
+    fclose(file_desc);
+}
+

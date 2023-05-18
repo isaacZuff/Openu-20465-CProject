@@ -1,7 +1,7 @@
 /* Helper functions to process and analyze code */
-#ifndef _CODE_H
-#define _CODE_H
-#include "table.h"
+#ifndef _OPCODE_BUILDER_H
+#define _OPCODE_BUILDER_H
+#include "symbol_table.h"
 #include "globals.h"
 
 /**

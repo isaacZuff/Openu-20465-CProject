@@ -3,8 +3,8 @@
 #include <ctype.h>
 #include <stdarg.h>
 #include <stdlib.h>
-#include "code.h"
-#include "utils.h"
+#include "opcode_builder.h"
+#include "helper.h"
 
 
 /**

@@ -1,7 +1,7 @@
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include "utils.h"
+#include "helper.h"
 
 
 /* Returns the first instruction from the specified index. if no such one, returns NONE */
@@ -18,7 +18,7 @@ instruction parse_instruction_from_index(line_descriptor line, int *index) {
     }
     temp[j] = '\0'; /* End of string */
     /* if invalid instruction but starts with ., return error */
-    if ((result = find_instruction_by_name(temp + 1)) != NONE_INST) { /* temp + 1(skip '.')*/
+    if ((result = get_instruction_by_name(temp + 1)) != NONE_INST) { /* temp + 1(skip '.')*/
         return result;
     }
     fprintf_error_specific(line, "[ERROR] Invalid instruction name: %s", temp);

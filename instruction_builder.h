@@ -1,6 +1,6 @@
 /* Helper functions for instruction analyzing */
-#ifndef _INSTRUCTIONS_H
-#define _INSTRUCTIONS_H
+#ifndef _INSTRUCTION_BUILDER_H
+#define _INSTRUCTION_BUILDER_H
 #include "globals.h"
 
 /**

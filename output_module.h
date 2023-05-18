@@ -1,8 +1,8 @@
 /* Output files related functions */
-#ifndef _WRITEFILES_H
-#define _WRITEFILES_H
+#ifndef OUTPUT_MODULE_H
+#define OUTPUT_MODULE_H
 #include "globals.h"
-#include "table.h"
+#include "symbol_table.h"
 
 /**
  * Writes the output files of a single assembled file
@@ -17,5 +17,13 @@
  */
 int write_output_files(machine_word **code_img, long *data_img, long icf, long dcf, char *filename,
                        table symbol_table);
+
+
+/***
+ * Output the lines after macro expansion to file
+ * @param lines_to_write
+ * @param filename
+ */
+void write_macro_file(simple_node* lines_to_write, char* filename);
 
 #endif

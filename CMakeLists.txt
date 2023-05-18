@@ -5,9 +5,9 @@ set(CMAKE_C_STANDARD 90)
 # Default CLion generated
 project(mmn14_cool)
 add_executable(mmn14 assembler.c
-		table.c table.h
-		instructions.c instructions.h utils.c utils.h code.c code.h writefiles.c writefiles.h globals.h
-		first_pass.c first_pass.h second_pass.c second_pass.h linkedlist.c)
+		symbol_table.c symbol_table.h
+		instruction_builder.c instruction_builder.h helper.c helper.h opcode_builder.c opcode_builder.h output_module.c output_module.h globals.h
+		first_pass.c first_pass.h second_pass.c second_pass.h linkedlist.c pre_assembler.c pre_assembler.h linkedlist.h)
 ## math library, gcc option -lm
 #target_link_libraries(mmn14 m)
 ## add warning flags -pedantic -Wall

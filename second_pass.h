@@ -2,26 +2,26 @@
 #ifndef _SECOND_PASS_H
 #define _SECOND_PASS_H
 #include "globals.h"
-#include "table.h"
+#include "symbol_table.h"
 
 /**
- * Processes a single source line in the second pass
- * @param line The source line
- * @param ic ABSOLUTE pointer to the current instruction counter
- * @param code_img The code image
+ * Processes a single line in the second pass
+ * @param line The line string
+ * @param ic  pointer to instruction counter
+ * @param code_img Code image
  * @param symbol_table The symbol table
- * @return Whether succeeded
+ * @return Whether operation succeeded
  */
 bool process_line_second_pass(line_descriptor line, long *ic, machine_word **code_img, table *symbol_table);
 
-/**
- * Adds the symbol-dependent data words by the code line.
- * @param line The source code line
- * @param ic ABSOLUTE pointer to the current instruction counter
- * @param code_img The code image
- * @param symbol_table The symbol table
- * @return Whether succeeded
- */
+/***
+  * populate the missing values in the code image
+  * @param line Proceesed line
+  * @param ic pointer to ic counter
+  * @param code_img code image array
+  * @param symbol_table symbol_table pointer
+  * @return
+  */
 bool add_symbol_to_machine_code(line_descriptor line, long *ic, machine_word **code_img, table *symbol_table);
 
 #endif

@@ -1,11 +1,10 @@
 /* Contains major function that are related to the first pass */
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
 #include "globals.h"
-#include "code.h"
-#include "utils.h"
-#include "instructions.h"
+#include "opcode_builder.h"
+#include "helper.h"
+#include "instruction_builder.h"
 #include "first_pass.h"
 
 
@@ -17,7 +16,7 @@
  * @param i Where to start processing the line from
  * @param ic ABSOLUTE pointer to the current instruction counter
  * @param code_img The code image array
- * @return Whether succeeded or notssss
+ * @return Success status
  */
 static bool process_code(line_descriptor line, int i, long *ic, machine_word **code_img);
 
@@ -56,7 +55,7 @@ bool process_line_first_pass(line_descriptor line, long *IC, long *DC, machine_w
 
 
 	if (symbol[0] != '\0') {
-        /* Its a symbol, lets move the index to label content section
+        /* It's a symbol, lets move the index to label content section
          * index of ':' + mandatory space after*/
         is_symbol = TRUE;
         i = index_of_char(line.content,':') + 1;
@@ -88,7 +87,7 @@ bool process_line_first_pass(line_descriptor line, long *IC, long *DC, machine_w
 			/* is data or string, add DC with the symbol to the table as data */
 			add_table_item(symbol_table, symbol, *DC, DATA_SYMBOL);
 
-		/* if its a string instruction, encode into data image buffer and increase dc as needed. */
+		/* if it's a string instruction, encode into data image buffer and increase dc as needed. */
 		if (instruction == STRING_INST)
 			return process_string_instruction(line, i, data_img, DC);
 			/* if .data, do same but parse numbers. */
@@ -144,13 +143,13 @@ static void encode_addressing_additional_words(machine_word **code_img, long *ic
  * @param i Where to start processing the line from
  * @param ic ABSOLUTE pointer to the current instruction counter
  * @param code_img The code image array
- * @return Whether succeeded or notssss
+ * @return Success status boolean
  */
 static bool process_code(line_descriptor line, int i, long *ic, machine_word **code_img) {
 	char operation[8]; /* stores the string of the current code instruction */
 	char *operands[2]; /* 2 strings, each for operand */
     long start_ic;
-    int j, operand_count,status;
+    int j, operand_count;
 	opcode curr_opcode; /* the current opcode and funct values */
 	funct curr_funct;
 	machine_word *opcode_machine_word, *operand_machine_word;
@@ -178,8 +177,8 @@ static bool process_code(line_descriptor line, int i, long *ic, machine_word **c
 	}
 
 	/* Build code word struct to store in code image array */
-	if ((status = encode_opdcode_wards(line, curr_opcode, curr_funct, operand_count, operands, &opcode_word_temp,
-                                       &operand_word_temp)) == 0) {
+	if ((encode_opcode_wards(line, curr_opcode, curr_funct, operand_count, operands, &opcode_word_temp,
+                             &operand_word_temp)) == 0) {
 		/* Release allocated memory for operands */
 		if (operands[0]) {
 			free(operands[0]);
@@ -189,14 +188,14 @@ static bool process_code(line_descriptor line, int i, long *ic, machine_word **c
 		}
 		return FALSE;
 	}
-    status; /* nope */
+    /* nope */
 
     /* IC before encoding of opcode+operands */
     start_ic = *ic;
 	/* allocate memory for a new word in the code image, and put the code word into it */
 	opcode_machine_word = (machine_word *) better_malloc(sizeof(machine_word));
 	opcode_machine_word->word.opcode = opcode_word_temp;
-	code_img[(*ic) - IC_INIT_VALUE] = opcode_machine_word; /* IC initialized to 100 but we shouldn't skip the first cells  */
+	code_img[(*ic) - IC_INIT_VALUE] = opcode_machine_word; /* IC initialized to 100, but we shouldn't skip the first cells  */
 
     if(operand_word_temp != NULL) {
         (*ic)++;

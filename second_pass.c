@@ -1,8 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "second_pass.h"
-#include "code.h"
-#include "utils.h"
+#include "opcode_builder.h"
+#include "helper.h"
 #include "string.h"
 
 int process_second_pass_operand(line_descriptor line, long *curr_ic, char *operand, machine_word **code_img,
@@ -11,7 +11,7 @@ int process_second_pass_operand(line_descriptor line, long *curr_ic, char *opera
 /**
  * Processes a single line in the second pass
  * @param line The line string
- * @param ic ABSOLUTE pointer to instruction counter
+ * @param ic  pointer to instruction counter
  * @param code_img Code image
  * @param symbol_table The symbol table
  * @return Whether operation succeeded
@@ -69,17 +69,14 @@ bool process_line_second_pass(line_descriptor line, long *ic, machine_word **cod
 	return add_symbol_to_machine_code(line, ic, code_img, symbol_table);
 }
 
-/**
- * Find the symbol that need replacment in a code line, and replacing them by the address in the symbol table.
- * @param line The current code line that is being processed
- * @param ic ABSOLUTE pointer to the current instruction counter
- * @param code_img The machine code image array
- * @param data_table The data symbol table
- * @param code_table The code symbol table
- * @param ext_table The externals symbol table
- * @param ext_references ABSOLUTE pointer to the external symbols references table
- * @return whether succeeded
- */
+/***
+  * populate the missing values in the code image
+  * @param line Proceesed line
+  * @param ic pointer to ic counter
+  * @param code_img code image array
+  * @param symbol_table symbol_table pointer
+  * @return
+  */
 bool add_symbol_to_machine_code(line_descriptor line, long *ic, machine_word **code_img, table *symbol_table) {
 	char temp[80];
 	char *operands[2];
@@ -155,6 +152,7 @@ int process_second_pass_operand(line_descriptor line, long *curr_ic, char *opera
 
         if(INDEX_ADDR == addr){
             free(search_operand);
+            search_operand =operand;
         }
 
         if (entry == NULL) {

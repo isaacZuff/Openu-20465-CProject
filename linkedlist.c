@@ -2,123 +2,117 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include "linkedlist.h"
+#include "string.h"
+#include "globals.h"
+#include "helper.h"
 
-// Create a node
-struct Node {
-    int data;
-    struct Node* next;
-};
-
-// Insert at the beginning
-void insertAtBeginning(struct Node** head_ref, int new_data) {
+/***
+ * Inserts node at the start of the list
+ * @param head_ref pointer to list head
+ * @param new_data string
+ */
+void insert_at_the_head(struct list_node** head_ref, char* new_data) {
     // Allocate memory to a node
-    struct Node* new_node = (struct Node*)malloc(sizeof(struct Node));
+    list_node *new_node = (list_node*)better_malloc(sizeof(list_node));
 
     // insert the data
-    new_node->data = new_data;
-
+    new_node->data = strdup(new_data);
     new_node->next = (*head_ref);
+    new_node->macro_lines = NULL;
 
     // Move head to new node
     (*head_ref) = new_node;
 }
 
-// Insert a node after a node
-void insertAfter(struct Node* prev_node, int new_data) {
-    if (prev_node == NULL) {
-        printf("the given previous node cannot be NULL");
-        return;
-    }
 
-    struct Node* new_node = (struct Node*)malloc(sizeof(struct Node));
-    new_node->data = new_data;
-    new_node->next = prev_node->next;
-    prev_node->next = new_node;
+/***
+ * Inserts node list "object" at the end of the list
+ * @param head_ref  pointer to list head
+ * @param new_data string
+ * @returns the_new_node_created
+ */
+list_node * insert_node_list_at_the_end(list_node** head_ref, char* new_data) {
+    list_node *new_node = (list_node*)better_malloc(sizeof(list_node));
+    list_node *last; /* used in step 5*/
+
+    new_node->data = strdup(new_data);
+    new_node->next = NULL;
+    new_node->macro_lines = NULL;
+
+    if (*head_ref == NULL) {
+        *head_ref = new_node;
+        return new_node;
+    }
+    last = *head_ref;
+
+    while (last->next != NULL) last = last->next;
+
+    last->next = new_node;
+    return new_node;
 }
 
-// Insert the the end
-void insertAtEnd(struct Node** head_ref, int new_data) {
-    struct Node* new_node = (struct Node*)malloc(sizeof(struct Node));
-    struct Node* last = *head_ref; /* used in step 5*/
+/***
+ * Insert new node at the end of linked list string or creates the list
+ * @param head_ref head if exists null if not
+ * @param new_data string to add
+ */
+void insert_string_node_at_the_end(simple_node ** head_ref, char* new_data) {
+    simple_node *new_node = (simple_node*)better_malloc(sizeof(simple_node));
+    simple_node *last; /* used in step 5*/
 
-    new_node->data = new_data;
+    new_node->data = strdup(new_data);
     new_node->next = NULL;
 
     if (*head_ref == NULL) {
         *head_ref = new_node;
         return;
     }
+    last = *head_ref;
 
     while (last->next != NULL) last = last->next;
 
     last->next = new_node;
-    return;
 }
 
-// Delete a node
-void deleteNode(struct Node** head_ref, int key) {
-    struct Node *temp = *head_ref, *prev;
-
-    if (temp != NULL && temp->data == key) {
-        *head_ref = temp->next;
-        free(temp);
-        return;
-    }
-    // Find the key to be deleted
-    while (temp != NULL && temp->data != key) {
-        prev = temp;
-        temp = temp->next;
-    }
-
-    // If the key is not present
-    if (temp == NULL) return;
-
-    // Remove the node
-    prev->next = temp->next;
-
-    free(temp);
+/**
+ * creates linked list node
+ * @param new_data string
+ * @return new object created
+ */
+list_node *create_list_node(char* new_data){
+    list_node *new_node = (list_node*)malloc(sizeof(list_node));
+    new_node->data = strdup(new_data);
+    new_node->next = NULL;
+    return new_node;
 }
 
-// Search a node
-int searchNode(struct Node** head_ref, int key) {
-    struct Node* current = *head_ref;
+/***
+ * finds field in list
+ * @param field_to_find
+ * @return If found --> node, Else --> NULL
+ */
+list_node *find_node_in_list(list_node* node, char* field_to_find){
+    list_node* current_node = node;
 
-    while (current != NULL) {
-        if (current->data == key) return 1;
-        current = current->next;
-    }
-    return 0;
-}
-
-// Sort the linked list
-void sortLinkedList(struct Node** head_ref) {
-    struct Node *current = *head_ref, *index = NULL;
-    int temp;
-
-    if (head_ref == NULL) {
-        return;
-    } else {
-        while (current != NULL) {
-            // index points to the node next to current
-            index = current->next;
-
-            while (index != NULL) {
-                if (current->data > index->data) {
-                    temp = current->data;
-                    current->data = index->data;
-                    index->data = temp;
-                }
-                index = index->next;
-            }
-            current = current->next;
+    while (current_node != NULL){
+        if(strcmp(current_node->data,field_to_find) == 0){
+            return current_node;
         }
+        current_node = current_node->next;
     }
+    return NULL;
 }
 
-// Print the linked list
-void printList(struct Node* node) {
-    while (node != NULL) {
-        printf(" %d ", node->data);
-        node = node->next;
+/***
+ * Free memory allocated for node
+ * @param node node to free
+ */
+void free_string_node(simple_node** node){
+    if(*node == NULL){
+        if((*node)->data != NULL) {
+            free((*node)->data);
+        }
+        free((*node));
     }
 }
